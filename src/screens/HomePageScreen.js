@@ -1,53 +1,26 @@
-import React, {useState, useEffect} from 'react';
-import {CommonActions} from '@react-navigation/native';
-import {
-  View,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  Image,
-  BackHandler,
-  Alert,
-} from 'react-native';
-import {styles} from '../Styles/MainStyle';
-import {API_BASE_URL} from '../utils/varConsts';
+import React, { useState } from 'react';
+import { View, TextInput, Text, TouchableOpacity, Image, ImageBackground, Alert } from 'react-native';
+import { styles } from '../Styles/MainStyle'; // Ensure this path is correct
+import { API_BASE_URL } from '../utils/varConsts'; // Adjust if needed
 import axios from 'axios';
-const HomePageScreen = ({navigation}) => {
+
+const HomePageScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const backAction = () => {
-    navigation.goBack();
-    return true;
-  };
-
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-    return () => backHandler.remove();
-  }, []);
-
   const handleLoginPress = async () => {
+    if (!username || !password) {
+      Alert.alert('Please enter both username and password');
+      return;
+    }
+
     try {
-      const endpoint = `${API_BASE_URL}/auth/login`;
-        const inputData = {
-          username: username,
-          password: password,
-        };
-      const response = await axios.post(endpoint, inputData);
-      console.log(JSON.stringify(response, null, 2));
-      if (response.status === 200 && typeof response.data === 'object') {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{name: 'ProfileScreen'}],
-          }),
-        );
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, { username, password });
+      if (response.status === 200) {
+        navigation.navigate('ProfileScreen');
       }
-    } catch (er) {
-      console.log(er);
+    } catch (error) {
+      console.error(error);
       Alert.alert('Something went wrong. Please try again');
     }
   };
@@ -57,41 +30,27 @@ const HomePageScreen = ({navigation}) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.logoContainer}>
-        <Image
-          source={{
-            uri: 'https://www.bootdey.com/img/Content/avatar/avatar5.png',
-          }}
-          style={styles.logo}
-        />
-      </View>
-      <View style={styles.card}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Ganda mo" 
-            onChangeText={text => setUsername(text)}
-            value={username}
-          />
+    <ImageBackground
+    source={require('../assets/ning.jpeg')}
+
+      style={styles.background}
+    >
+      <p>Gr</p>
+      <View style={styles.container}>
+        <View style={styles.logoContainer}>
+          
         </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            onChangeText={text => setPassword(text)}
-            value={password}
-            secureTextEntry={true}
-          />
+        <View style={styles.card}>
+        
+          <TouchableOpacity style={styles.button1} onPress={handleLoginPress}>
+            <Text style={styles.buttonText1}>Log In</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button1} onPress={handleRegisterPress}>
+            <Text style={styles.buttonText1}>Register</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.button1} onPress={handleLoginPress}>
-          <Text style={styles.buttonText1}>Log In</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button1} onPress={handleRegisterPress}>
-          <Text style={styles.buttonText1}>Register</Text>
-        </TouchableOpacity>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
